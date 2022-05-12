@@ -2,6 +2,8 @@ import 'dart:ui';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:county_manager/screens/lobby.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:path/path.dart';
 import '../src/variables.dart';
@@ -15,8 +17,8 @@ enum ApplicationLoginState {
   loggedIn,
 }
 
-class Authentication extends StatelessWidget {
-  const Authentication({
+class Authentication extends StatefulWidget {
+  Authentication({
     required this.loginState,
     required this.email,
     required this.startLoginFlow,
@@ -49,8 +51,15 @@ class Authentication extends StatelessWidget {
   final void Function() signOut;
 
   @override
+  State<Authentication> createState() => _AuthenticationState();
+}
+
+class _AuthenticationState extends State<Authentication> {
+  var nameUser;
+
+  @override
   Widget build(BuildContext context) {
-    switch (loginState) {
+    switch (widget.loginState) {
       case ApplicationLoginState.loggedOut:
         return Row(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -65,7 +74,7 @@ class Authentication extends StatelessWidget {
                 padding: const EdgeInsets.only(left: 24, bottom: 8, top: 250),
                 child: StyledButton(
                   onPressed: () {
-                    startLoginFlow();
+                    widget.startLoginFlow();
                   },
                   child: Text(
                     'Iniciar Sesion/Registro',
@@ -79,28 +88,28 @@ class Authentication extends StatelessWidget {
         );
       case ApplicationLoginState.emailAddress:
         return EmailForm(
-            callback: (email) => verifyEmail(
+            callback: (email) => widget.verifyEmail(
                 email, (e) => _showErrorDialog(context, 'Invalid email', e)));
       case ApplicationLoginState.password:
         return PasswordForm(
-          email: email!,
+          email: widget.email!,
           login: (email, password) {
-            signInWithEmailAndPassword(email, password,
+            widget.signInWithEmailAndPassword(email, password,
                 (e) => _showErrorDialog(context, 'Failed to sign in', e));
           },
         );
       case ApplicationLoginState.register:
         return RegisterForm(
-          email: email!,
+          email: widget.email!,
           cancel: () {
-            cancelRegistration();
+            widget.cancelRegistration();
           },
           registerAccount: (
             email,
             displayName,
             password,
           ) {
-            registerAccount(
+            widget.registerAccount(
                 email,
                 displayName,
                 password,
@@ -112,10 +121,7 @@ class Authentication extends StatelessWidget {
         return Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text(
-              "Sesión Iniciada",
-              style: TextStyle(fontSize: 40, color: textColorNormal),
-            ),
+            bienvenidaWgt(),
             Padding(
               padding: const EdgeInsets.only(left: 24, bottom: 8),
               child: Row(
@@ -134,7 +140,7 @@ class Authentication extends StatelessWidget {
                       }),
                   StyledButton(
                     onPressed: () {
-                      signOut();
+                      widget.signOut();
                     },
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.end,
@@ -196,6 +202,22 @@ class Authentication extends StatelessWidget {
   }
 
   fromARGB(int i, int j, int k, int l) {}
+}
+
+class bienvenidaWgt extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Text(
+          "Sesión Iniciada",
+          style: TextStyle(fontSize: 40, color: textColorNormal),
+        ),
+        Text("Bienvenidx",
+            style: TextStyle(fontSize: 35, color: textColorNormal))
+      ],
+    );
+  }
 }
 
 class EmailForm extends StatefulWidget {
