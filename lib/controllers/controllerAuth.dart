@@ -33,9 +33,10 @@ class ApplicationState extends ChangeNotifier {
           for (final document in snapshot.docs) {
             _guestBookMessages.add(
               GuestBookMessage(
-                name: document.data()['name'] as String,
-                message: document.data()['text'] as String,
-              ),
+                  nameProduct: document.data()['nameP'] as String,
+                  priceProduct: document.data()['priceP'] as String,
+                  typeProduct: document.data()['typeP'] as String,
+                  descrProduct: document.data()['descP'] as String),
             );
           }
           notifyListeners();
@@ -65,12 +66,12 @@ class ApplicationState extends ChangeNotifier {
   }
 
   Future<void> verifyEmail(
-      String email,
-      void Function(FirebaseAuthException e) errorCallback,
-      ) async {
+    String email,
+    void Function(FirebaseAuthException e) errorCallback,
+  ) async {
     try {
       var methods =
-      await FirebaseAuth.instance.fetchSignInMethodsForEmail(email);
+          await FirebaseAuth.instance.fetchSignInMethodsForEmail(email);
       if (methods.contains('password')) {
         _loginState = ApplicationLoginState.password;
       } else {
@@ -84,10 +85,10 @@ class ApplicationState extends ChangeNotifier {
   }
 
   Future<void> signInWithEmailAndPassword(
-      String email,
-      String password,
-      void Function(FirebaseAuthException e) errorCallback,
-      ) async {
+    String email,
+    String password,
+    void Function(FirebaseAuthException e) errorCallback,
+  ) async {
     try {
       await FirebaseAuth.instance.signInWithEmailAndPassword(
         email: email,
@@ -121,17 +122,15 @@ class ApplicationState extends ChangeNotifier {
     FirebaseAuth.instance.signOut();
   }
 
-  Future<DocumentReference> addMessageToGuestBook(
-      String message, String imageDirectionDB) {
-    if (_loginState != ApplicationLoginState.loggedIn) {
-      throw Exception('Must be logged in');
-    }
-
+  Future<DocumentReference> addMessageToGuestBook(String nameProduct,
+      String priceProduct, String typeProduct, String descriptionProduct) {
     return FirebaseFirestore.instance
         .collection('guestbook')
         .add(<String, dynamic>{
-      'text': message,
-      'image': imageDirectionDB,
+      'nameP': nameProduct,
+      'priceP': priceProduct,
+      'typeP': typeProduct,
+      'descP': descriptionProduct,
       'timestamp': DateTime.now().millisecondsSinceEpoch,
       'name': FirebaseAuth.instance.currentUser!.displayName,
       'userId': FirebaseAuth.instance.currentUser!.uid,
@@ -140,15 +139,29 @@ class ApplicationState extends ChangeNotifier {
 }
 
 class GuestBookMessage {
-  GuestBookMessage({required this.name, required this.message});
-  final String name;
-  final String message;
+  GuestBookMessage(
+      {required this.nameProduct,
+      required this.priceProduct,
+      required this.descrProduct,
+      required this.typeProduct});
+  final String nameProduct;
+  final String priceProduct;
+  final String typeProduct;
+  final String descrProduct;
 }
 
 class GuestBook extends StatefulWidget {
-  const GuestBook({required this.addMessage, required this.messages});
-  final FutureOr<void> Function(String message) addMessage;
-  final List<GuestBookMessage> messages;
+  const GuestBook(
+      {required this.addNameProduct,
+      required this.addPriceProduct,
+      required this.addDescrProduct,
+      required this.addTypeProduct,
+      required this.productos});
+  final FutureOr<void> Function(String message) addNameProduct;
+  final FutureOr<void> Function(String message) addPriceProduct;
+  final FutureOr<void> Function(String message) addDescrProduct;
+  final FutureOr<void> Function(String message) addTypeProduct;
+  final List<GuestBookMessage> productos;
 
   @override
   _GuestBookState createState() => _GuestBookState();
@@ -188,7 +201,7 @@ class _GuestBookState extends State<GuestBook> {
                 StyledButton(
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
-                      await widget.addMessage(_controller.text);
+                      //await widget.addMessage(_controller.text);
                       _controller.clear();
                     }
                   },
@@ -206,8 +219,8 @@ class _GuestBookState extends State<GuestBook> {
         ),
         // Modify from here
         const SizedBox(height: 8),
-        for (var message in widget.messages)
-          Paragraph('${message.name}: ${message.message}'),
+        //for (var message in widget.messages)
+        //Paragraph('${message.name}: ${message.message}'),
         const SizedBox(height: 8),
       ],
       // to here.

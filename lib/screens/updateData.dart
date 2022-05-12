@@ -1,7 +1,9 @@
+import 'package:county_manager/controllers/controllerAuth.dart';
 import 'package:county_manager/screens/lobby.dart';
 import 'package:county_manager/src/variables.dart';
 import 'package:county_manager/src/widgets.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 void main() => runApp(updateData());
@@ -73,7 +75,7 @@ class _updateDataState extends State<updateData> {
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(10)),
                     child: TextField(
-                      controller: _nameProduct,
+                      controller: _priceProduct,
                       decoration: InputDecoration(
                           hintText: 'Ingrese el Costo del producto'),
                       onChanged: (texto) {
@@ -102,7 +104,6 @@ class _updateDataState extends State<updateData> {
                         if (newValue != 'Seleccione') {
                           setState(() {
                             _varTypeProduct = newValue!;
-                            print(_varTypeProduct);
                           });
                         }
                       },
@@ -114,12 +115,12 @@ class _updateDataState extends State<updateData> {
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(10)),
                     child: TextField(
-                      controller: _nameProduct,
+                      controller: _descriptionProduct,
                       // ignore: prefer_const_constructors
                       decoration: InputDecoration(
                           hintText: 'Ingrese una descripcion para el producto'),
                       onChanged: (texto) {
-                        _varNameProduct = texto;
+                        _varDescriptionProduct = texto;
                       },
                     ),
                   ),
@@ -147,13 +148,21 @@ class _updateDataState extends State<updateData> {
                                       context,
                                       MaterialPageRoute(
                                           builder: (context) => lobby()));
+                                  ApplicationState().addMessageToGuestBook(
+                                      _varNameProduct,
+                                      _varPriceProduct,
+                                      _varTypeProduct,
+                                      _varDescriptionProduct);
                                 }
                               });
                             });
                           }),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
-                            children: [Text("Enviar"), Icon(Icons.send)],
+                            children: [
+                              Text("Enviar"),
+                              Icon(Icons.send),
+                            ],
                           ),
                         ),
                       )
