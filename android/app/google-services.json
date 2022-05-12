@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "424822883423",
+    "project_id": "county-manager",
+    "storage_bucket": "county-manager.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:424822883423:android:7606db08bb68090b2407ea",
+        "android_client_info": {
+          "package_name": "com.example.county_manager.county_manager"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "424822883423-hubh24oqb7nkim1ficonkrlqdjak98t3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAh9W-5Ot9OsQ5DKnNb4NH5TTZwdmPYLrU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "424822883423-hubh24oqb7nkim1ficonkrlqdjak98t3.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
