@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:county_manager/controllers/controllerAuth.dart';
 import 'package:county_manager/screens/lobby.dart';
 import 'package:county_manager/src/variables.dart';
@@ -42,10 +43,10 @@ class _updateDataState extends State<updateData> {
           color: Color(0xFFFFFFFF),
         )),
       ),
-      title: 'Material App',
+      title: 'updateData',
       home: Scaffold(
         appBar: AppBar(
-          title: Text('Material App Bar'),
+          title: Text('Añadir producto'),
         ),
         body: Center(
           child: Container(
@@ -148,6 +149,23 @@ class _updateDataState extends State<updateData> {
                                       context,
                                       MaterialPageRoute(
                                           builder: (context) => lobby()));
+
+                                  FirebaseFirestore.instance
+                                      .collection("publicaion")
+                                      .doc()
+                                      .set({
+                                    'nameP': _varNameProduct,
+                                    'priceP': _varPriceProduct,
+                                    'typeP': _varTypeProduct,
+                                    'descP': _varDescriptionProduct,
+                                    'timestamp':
+                                        DateTime.now().millisecondsSinceEpoch,
+                                    'name': FirebaseAuth
+                                        .instance.currentUser!.displayName,
+                                    'userId':
+                                        FirebaseAuth.instance.currentUser!.uid,
+                                  });
+
                                   ApplicationState().addMessageToGuestBook(
                                       _varNameProduct,
                                       _varPriceProduct,
