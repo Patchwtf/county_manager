@@ -2,6 +2,7 @@ import 'package:county_manager/controllers/authentication.dart';
 import 'package:county_manager/controllers/controllerAuth.dart';
 import 'package:county_manager/screens/homePage.dart';
 import 'package:county_manager/screens/updateData.dart';
+import 'package:county_manager/screens/viewData.dart';
 import 'package:county_manager/src/variables.dart';
 import 'package:county_manager/src/widgets.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -78,6 +79,10 @@ class _lobbyState extends State<lobby> {
                     ),
                     Expanded(
                         child: Cajita(
+                      puchale: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: ((context) => viewData()))),
                       colorin: Color.fromARGB(255, 255, 255, 255),
                       escuincle: Column(
                         mainAxisAlignment: MainAxisAlignment.center,

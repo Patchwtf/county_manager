@@ -25,7 +25,7 @@ class ApplicationState extends ChangeNotifier {
         _loginState = ApplicationLoginState.loggedIn;
         //?Obtencion de mensajes*/
         _guestBookSubscription = FirebaseFirestore.instance
-            .collection('publication')
+            .collection('guestbook')
             .orderBy('timestamp', descending: true)
             .snapshots()
             .listen((snapshot) {
