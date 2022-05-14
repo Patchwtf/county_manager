@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:county_manager/src/variables.dart';
 import 'package:county_manager/src/widgets.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -16,72 +17,109 @@ class viewData extends StatefulWidget {
   State<viewData> createState() => _viewDataState();
 }
 
-var _guestBookMessages;
-
 class _viewDataState extends State<viewData> {
   var user = FirebaseAuth.instance.currentUser;
-  final datos =
-      FirebaseFirestore.instance.collection("publicacion").snapshots();
 
-  void obtenerDatos() async {
-    await FirebaseFirestore.instance
-        .collection("publicacion")
-        .orderBy("timestamp", descending: true)
-        .snapshots()
-        .listen(
-      (snapshot) {
-        _guestBookMessages = [];
-        for (final document in snapshot.docs) {
-          print(document.data()['nameP'] as String);
-          //?_guestBookMessages.add(
-          //?  GuestBookMessage(
-          //?      nameProduct: document.data()['nameP'] as String,
-          //?      priceProduct: document.data()['priceP'] as String,
-          //?      typeProduct: document.data()['typeP'] as String,
-          //?      descrProduct: document.data()['descP'] as String),
-          //?);
-        }
-      },
-    );
-  }
+  late Stream<QuerySnapshot> _query;
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      theme: ThemeData(
-        scaffoldBackgroundColor: Color(0xFF0E1436),
-        colorScheme: ColorScheme.fromSwatch().copyWith(
-          primary: Color(0xFF11163B),
-          secondary: Color(0xFFFF0067),
-        ),
-        textTheme: const TextTheme(
-            bodyText2: TextStyle(
-          color: Color(0xFFFFFFFF),
-        )),
-      ),
-      title: 'viewData',
-      home: Scaffold(
-        appBar: AppBar(
-          title: Text('Verifica los datos'),
-        ),
-        body: Center(
-          child: StyledButton(
-            child: Text(
-              "Push Me",
-              style: TextStyle(color: Colors.white),
-            ),
-            onPressed: () async {
-              await datos.listen(((event) {
-                for (final i in event.docs) {
-                  print(i.data()['nameP'] as String);
-                }
-                //print(event.data()!['nameP'] as String);
-              }));
+    _query = FirebaseFirestore.instance
+        .collection('guestbook')
+        .orderBy('timestamp', descending: true)
+        .snapshots();
 
-              obtenerDatos();
+    return MaterialApp(
+        theme: ThemeData(
+          scaffoldBackgroundColor: Color(0xFF0E1436),
+          colorScheme: ColorScheme.fromSwatch().copyWith(
+            primary: Color(0xFF11163B),
+            secondary: Color(0xFFFF0067),
+          ),
+          textTheme: const TextTheme(
+              bodyText2: TextStyle(
+            color: Color(0xFFFFFFFF),
+          )),
+        ),
+        title: 'viewData',
+        home: Scaffold(
+          appBar: AppBar(
+            centerTitle: true,
+            title: Text("Vista de datos"),
+          ),
+          body: StreamBuilder<QuerySnapshot>(
+            stream: _query,
+            builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> data) {
+              if (data.hasData) {
+                return datosCard(
+                  documents: data.data!.docs,
+                );
+              }
+              return const Center(
+                child: CircularProgressIndicator(color: Colors.amber),
+              );
             },
           ),
-        ),
+        ));
+  }
+}
+
+class datosCard extends StatefulWidget {
+  final List<DocumentSnapshot> documents;
+  final nombreP, precioP, descrP, tipoP;
+
+  datosCard({Key? key, required this.documents})
+      : nombreP = documents.map((doc) => doc['nameP'] as String),
+        precioP = documents.map((doc) => doc['priceP'] as String),
+        descrP = documents.map((doc) => doc['descP'] as String),
+        tipoP = documents.map((doc) => doc['typeP'] as String),
+        super(key: key);
+
+  @override
+  State<datosCard> createState() => _datosCardState();
+}
+
+class _datosCardState extends State<datosCard> {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      child: Column(
+        children: [
+          for (var datosI in widget.documents)
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Container(
+                decoration: BoxDecoration(
+                    color: datosI["typeP"].toString() == "Necesario"
+                        ? Colors.green
+                        : Color.fromARGB(255, 45, 114, 92),
+                    borderRadius: BorderRadius.circular(8)),
+                padding: EdgeInsets.all(10),
+                child: Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 20),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text("Nombre: ${datosI["nameP"].toString()}"),
+                          Text("Precio: ${datosI["priceP"].toString()}"),
+                        ],
+                      ),
+                    ),
+                    Text("Descripcion del Producto"),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text("${datosI["descP"].toString()}"),
+                        )
+                      ],
+                    )
+                  ],
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }
